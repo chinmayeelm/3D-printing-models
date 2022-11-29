@@ -1,19 +1,47 @@
 wallThickness = 4;
-pfThickness = 5;
-scpOR = 60;
+pfThickness = 4; //5;
 
-scape(wallThickness,pfThickness);
-pedicel();
-flagellum(wallThickness);
-head_plate(scpOR,wallThickness,pfThickness);
-
-//// Scape
-module scape(wallThickness,pfThickness){
-
+//Scape specifications
+scpOR = 50; //60;
 scpIR = scpOR - wallThickness; //Inner radius
-scpHeight = 40;
+scpHeight = 35; //40;
 scpHoleR = 2.5;
 scpHoleTheta = 120;
+
+//Pedicel specification
+pdlOR = 28;
+pdlIR = pdlOR - wallThickness;
+pdlHeight = 30;
+pdlTopIR = pdlOR -11;
+NledHoles = 10;
+pdlHoleTheta = 360/NledHoles;
+ledHoleR = 1.6;
+nPegs = 10;
+pegR = 3;
+pegTheta = pdlHoleTheta;
+pegHoleR = 1;
+
+//Flagellum specifications
+flgBottomOR = 15;
+flgBottomIR = flgBottomOR - wallThickness;
+flgTopOR = flgBottomOR/5;
+flgHeight = 100;
+flgHoleTheta = 360/NledHoles;
+
+//Head plate specifications
+plateR = scpOR+10;
+flapHeight = scpHeight-5;
+
+
+//scape(wallThickness,pfThickness, scpOR, scpIR, scpHeight, scpHoleR, scpHoleTheta);
+//pedicel(wallThickness,pfThickness,pdlOR, pdlIR, pdlHeight, pdlTopIR, NledHoles, pdlHoleTheta, ledHoleR, nPegs, pegR, pegTheta, pegHoleR);
+flagellum(wallThickness,pfThickness,NledHoles,flgBottomOR,flgBottomIR,flgTopOR,flgHeight,flgHoleTheta,pegHoleR);
+//head_plate(wallThickness,pfThickness, plateR, flapHeight);
+
+//// Scape
+module scape(wallThickness,pfThickness, scpOR, scpIR, scpHeight, scpHoleR, scpHoleTheta){
+
+
 
 
 union(){
@@ -26,7 +54,7 @@ union(){
         
         translate([-scpOR,-scpOR,scpHeight]) cube([scpOR*2,scpOR*2,scpOR*2]);
        
-        rotate([90,0,0]) translate([0,scpHeight-30,0]) for (i=[0:3])
+        rotate([90,0,0]) translate([0,scpHeight-23,0]) for (i=[0:3])
         rotate([0,scpHoleTheta*i,0]) translate([0,0,scpOR-5]) cylinder(h=wallThickness+10, r=scpHoleR, center = true, $fn=100);
     }
     
@@ -39,20 +67,13 @@ difference(){
 
 
 //// Pedicel
-module pedicel(){
-pdlOR = 38;
-pdlIR = pdlOR - wallThickness;
-pdlHeight = 40;
-pdlTopIR = pdlOR -11;
-NledHoles = 10;
-theta = 360/NledHoles;
-ledHoleR = 1.6;
-nPegs = 10;
-pegR = 3;
-pegTheta = theta;
-pegHoleR = 1;
+module pedicel(wallThickness,pfThickness,pdlOR, pdlIR, pdlHeight, pdlTopIR, NledHoles, pdlHoleTheta, ledHoleR, nPegs, pegR, pegTheta, pegHoleR){
 
-translate([0,0,64]) rotate([0,180,0])
+        l=65; 
+        w=4; 
+        h=6;
+    
+ translate([0,0,64]) rotate([0,180,0])
 union(){
     difference(){
         cylinder(h=pdlHeight, r=pdlOR, center=false, $fn=200);
@@ -61,28 +82,31 @@ union(){
     translate([0,0,2.5])
         
     // slots
+
     union(){
-        cube([65,8,6], center=true);
-        rotate(36) cube([65,8,6], center=true);
-        rotate(72) cube([65,8,6], center=true);
-        rotate(108) cube([65,8,6], center=true);
-        rotate(144) cube([65,8,6], center=true);
+        cube([l,w,h], center=true);
+        rotate(36) cube([l,w,h], center=true);
+        rotate(72) cube([l,w,h], center=true);
+        rotate(108) cube([l,w,h], center=true);
+        rotate(144) cube([l,w,h], center=true);
         }
         
     // holes for LED
 
     rotate([90,0,0]) translate([0,3,0]) for (i=[0:NledHoles])
-        rotate([0,theta*i,0]) translate([0,0,pdlOR-5]) cylinder(h=wallThickness+10, r=ledHoleR, center = true, $fn=100);
+        rotate([0,pdlHoleTheta*i,0]) translate([0,0,pdlOR-5]) cylinder(h=wallThickness+10, r=ledHoleR, center = true, $fn=100);
     } 
-    translate([0,0,15]) difference(){
-    cylinder(h=5, r=pdlIR+0.5, center=true, $fn=200);
+    //platform for flagellum
+    translate([0,0,pdlHeight/2]) difference(){
+    cylinder(h=pfThickness, r=pdlIR+0.5, center=true, $fn=200);
     cylinder(h=6, r=pdlOR-16, center=true, $fn=200);
 }
+// Pegs
 difference(){
 for (i=[0:nPegs])
-        translate([(pdlTopIR+5)*cos(i*theta+18), (pdlTopIR+5)*sin(i*theta+18),-4]) cylinder(h=wallThickness+5, r=pegR, center = true, $fn=100);
+        translate([(pdlTopIR+5)*cos(i*pdlHoleTheta+18), (pdlTopIR+5)*sin(i*pdlHoleTheta+18),-2]) cylinder(h=wallThickness, r=pegR, center = true, $fn=100);
 rotate([90,0,0]) translate([0,-4,0]) for (i=[0:NledHoles])
-        rotate([0,theta*i,0]) translate([0,0,pdlOR-5]) cylinder(h=wallThickness+10, r=pegHoleR, center = true, $fn=100);
+        rotate([0,pdlHoleTheta*i,0]) translate([0,2,pdlOR-5]) cylinder(h=wallThickness+10, r=pegHoleR, center = true, $fn=100);
 }
 }
 }
@@ -90,40 +114,35 @@ rotate([90,0,0]) translate([0,-4,0]) for (i=[0:NledHoles])
 
   
 ////Flagellum
-module flagellum(wallThickness){
-NledHoles = 10;
-flgBottomOR = 25;
-flgBottomIR = flgBottomOR - wallThickness;
-flgTopOR = flgBottomOR/5;
-flgHeight = 120;
-theta = 360/NledHoles;
-pegHoleR = 1;
+module flagellum(wallThickness,pfThickness,NledHoles,flgBottomOR,flgBottomIR,flgTopOR,flgHeight,flgHoleTheta,pegHoleR){
 
-translate([0,0,120])
+l=45;
+w=3;
+h=4;
+//translate([0,0,110])
 difference(){
 union(){
     cylinder(h=flgHeight, r1=flgBottomOR, r2=5, center=true, $fn=200);
-    translate([0,0,-58]) union(){
-        cube([64,6,5], center=true);
-        rotate(36) cube([64,6,5], center=true);
-        rotate(72) cube([64,6,5], center=true);
-        rotate(108) cube([64,6,5], center=true);
-        rotate(144) cube([64,6,5], center=true);
+    translate([0,0,-48]) union(){
+        cube([l,w,h], center=true);
+        rotate(36) cube([l,w,h], center=true);
+        rotate(72) cube([l,w,h], center=true);
+        rotate(108) cube([l,w,h], center=true);
+        rotate(144) cube([l,w,h], center=true);
     }
-    
+    translate([0,0,flgHeight/2]) sphere(r=5, $fn=100);
     }
-    translate([0,0,-2]) cylinder(h=flgHeight-2, r1=20, r2=2, center=true, $fn=200);
-    rotate([90,0,0]) translate([0,-50,0]) for (i=[0:NledHoles])
-        rotate([0,theta*i,0]) translate([0,0,flgBottomOR]) cylinder(h=wallThickness+10, r=pegHoleR, center = true, $fn=100);
+    translate([0,0,-2]) cylinder(h=flgHeight-2, r1=flgBottomIR, r2=2, center=true, $fn=200);
+    rotate([90,0,0]) translate([0,-44,0]) for (i=[0:NledHoles])
+        rotate([0,flgHoleTheta*i,0]) translate([0,0,flgBottomOR]) cylinder(h=wallThickness+10, r=pegHoleR, center = true, $fn=100);
     
 }
 }
 
 //
 ////Head plate
-module head_plate(scpOR,wallThickness,pfThickness){
-plateR = scpOR+10;
-flapHeight = 40;
+module head_plate(wallThickness,pfThickness, plateR, flapHeight){
+
 translate([0,0,-5]) union(){
     difference(){
     cylinder(h=pfThickness, r= plateR, center=true, $fn=200);
