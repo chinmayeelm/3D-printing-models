@@ -17,7 +17,7 @@ NledHoles = 10;
 pdlHoleTheta = 360/NledHoles;
 ledHoleR = 1.6;
 nPegs = 10;
-pegR = 3;
+pegR = 2;
 pegTheta = pdlHoleTheta;
 pegHoleR = 1;
 
@@ -34,8 +34,8 @@ flapHeight = scpHeight-5;
 
 
 //scape(wallThickness,pfThickness, scpOR, scpIR, scpHeight, scpHoleR, scpHoleTheta);
-//pedicel(wallThickness,pfThickness,pdlOR, pdlIR, pdlHeight, pdlTopIR, NledHoles, pdlHoleTheta, ledHoleR, nPegs, pegR, pegTheta, pegHoleR);
-flagellum(wallThickness,pfThickness,NledHoles,flgBottomOR,flgBottomIR,flgTopOR,flgHeight,flgHoleTheta,pegHoleR);
+pedicel(wallThickness,pfThickness,pdlOR, pdlIR, pdlHeight, pdlTopIR, NledHoles, pdlHoleTheta, ledHoleR, nPegs, pegR, pegTheta, pegHoleR);
+//flagellum(wallThickness,pfThickness,NledHoles,flgBottomOR,flgBottomIR,flgTopOR,flgHeight,flgHoleTheta,pegHoleR);
 //head_plate(wallThickness,pfThickness, plateR, flapHeight);
 
 //// Scape
@@ -70,10 +70,11 @@ difference(){
 module pedicel(wallThickness,pfThickness,pdlOR, pdlIR, pdlHeight, pdlTopIR, NledHoles, pdlHoleTheta, ledHoleR, nPegs, pegR, pegTheta, pegHoleR){
 
         l=65; 
-        w=4; 
+        w=6; 
         h=6;
     
- translate([0,0,64]) rotate([0,180,0])
+// translate([0,0,64]) 
+    rotate([0,180,0])
 union(){
     difference(){
         cylinder(h=pdlHeight, r=pdlOR, center=false, $fn=200);
@@ -97,16 +98,16 @@ union(){
         rotate([0,pdlHoleTheta*i,0]) translate([0,0,pdlOR-5]) cylinder(h=wallThickness+10, r=ledHoleR, center = true, $fn=100);
     } 
     //platform for flagellum
-    translate([0,0,pdlHeight/2]) difference(){
+    translate([0,0,pdlHeight-(pdlHeight/3)]) difference(){
     cylinder(h=pfThickness, r=pdlIR+0.5, center=true, $fn=200);
     cylinder(h=6, r=pdlOR-16, center=true, $fn=200);
 }
 // Pegs
 difference(){
 for (i=[0:nPegs])
-        translate([(pdlTopIR+5)*cos(i*pdlHoleTheta+18), (pdlTopIR+5)*sin(i*pdlHoleTheta+18),-2]) cylinder(h=wallThickness, r=pegR, center = true, $fn=100);
+        translate([(pdlTopIR+9)*cos(i*pdlHoleTheta+36), (pdlTopIR+9)*sin(i*pdlHoleTheta+36),3.5]) cylinder(h=wallThickness, r=pegR, center = true, $fn=100);
 rotate([90,0,0]) translate([0,-4,0]) for (i=[0:NledHoles])
-        rotate([0,pdlHoleTheta*i,0]) translate([0,2,pdlOR-5]) cylinder(h=wallThickness+10, r=pegHoleR, center = true, $fn=100);
+        rotate([0,(pdlHoleTheta*i)+18,0]) translate([0,7.5,pdlOR-5]) cylinder(h=wallThickness+10, r=pegHoleR, center = true, $fn=100);
 }
 }
 }
